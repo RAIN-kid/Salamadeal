@@ -13,7 +13,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [copiedType, setCopiedType] = useState<string | null>(null);
   
-  // State kwa ajili ya kuangalia picha Fullscreen
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -44,16 +43,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const deleteProduct = async () => {
-    if(!window.confirm("Una uhakika unataka kufuta bidhaa hii kabisa?")) return;
+    if(!window.confirm("Are you sure you want to delete this item permanently?")) return;
     try {
       await supabase.from('products').delete().eq('id', productId);
       router.push('/products');
     } catch (err) {
-      alert("Imeshindwa kufuta bidhaa.");
+      alert("Failed to delete item.");
     }
   };
 
-  // Logic za kubadili picha Fullscreen
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (product && lightboxIndex !== null) {
@@ -68,59 +66,69 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-gray-100 border-t-black rounded-full animate-spin"></div></div>;
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-surface-muted border-t-accent rounded-full animate-spin"></div></div>;
   if (!product) return null;
 
-  const productCode = product.product_code || 'Hakuna Code';
+  const productCode = product.product_code || 'No Code';
   const dealLink = typeof window !== 'undefined' ? `${window.location.origin}/deal/${productCode}` : '';
   
   return (
-    <div className="min-h-screen bg-white pb-32 relative">
+    <div className="min-h-screen flex flex-col relative pb-12 bg-background animate-fade-in">
       
-      {/* 1. HEADER (Safi, Inarudi kwenye List ya Bidhaa, Hakuna SalamaDeal) */}
-      <div className="w-full bg-white/95 backdrop-blur-md px-5 py-4 flex items-center justify-between border-b border-gray-100 sticky top-0 z-20">
-        <button onClick={() => router.push('/products')} className="p-2 -ml-2 bg-transparent rounded-full text-black hover:bg-gray-50 transition-colors">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      {/* 1. TOP HEADER (Standard Design System) */}
+      <div className="bg-background/90 backdrop-blur-md pt-12 pb-4 px-6 flex items-center justify-between sticky top-0 z-20">
+        <button 
+          onClick={() => router.push('/products')} 
+          className="w-11 h-11 bg-surface rounded-full flex items-center justify-center border border-surface-muted shadow-sm active:scale-95 transition-transform"
+        >
+          <svg className="w-5 h-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <span className="text-[17px] font-bold text-black">Taarifa za bidhaa</span>
-        <div className="w-8"></div> {/* Spacer ku-balance title ikae katikati */}
+        <h1 className="text-[18px] font-extrabold text-foreground tracking-tight">Item Details</h1>
+        <div className="w-11"></div> 
       </div>
 
-      <div className="max-w-xl mx-auto w-full px-5 mt-6 space-y-8">
+      <div className="flex-1 px-6 mt-6 space-y-6">
         
-        {/* 2. JINA NA BEI */}
+        {/* 2. TITLE & FINTECH PRICING */}
         <div>
-          <div className="flex justify-between items-start mb-1">
-            <h1 className="text-[20px] font-bold text-black leading-tight pr-4">{product.title}</h1>
-            <span className="bg-gray-100 px-3 py-1 rounded-full text-[13px] font-bold text-black whitespace-nowrap">
+          <div className="flex justify-between items-start mb-2">
+            <h1 className="text-[22px] font-extrabold text-foreground leading-tight pr-4">{product.title}</h1>
+            <span className="bg-surface border border-surface-muted px-3 py-1.5 rounded-[12px] text-[13px] font-bold text-foreground font-mono tracking-wider whitespace-nowrap shadow-sm">
               {productCode}
             </span>
           </div>
-          <p className="text-[30px] font-black text-black tracking-tight mt-1">
-            <span className="text-[15px] font-bold mr-1.5 text-gray-400">TZS</span>
-            {product.price?.toLocaleString()}
-          </p>
+          
+          <div className="mt-4">
+             <span className="text-[13px] font-bold text-muted uppercase tracking-widest mb-1 block">Selling Price</span>
+             <div className="flex items-end gap-1.5">
+                <span className="text-[20px] font-bold text-muted mb-1.5">TZS</span>
+                <p className="text-[42px] font-black text-foreground tracking-tight leading-none">
+                  {product.price?.toLocaleString()}
+                </p>
+             </div>
+          </div>
         </div>
 
-        {/* 3. MAELEZO (Flat design, no shadows) */}
+        {/* 3. DESCRIPTION CARD */}
         {product.description && (
-          <div className="bg-[#F9FAFB] p-5 rounded-[16px]">
-            <p className="text-[15px] text-gray-600 leading-relaxed">
+          <div className="bg-surface p-5 rounded-[24px] shadow-sm border border-surface-muted">
+            <h3 className="text-[14px] font-bold text-foreground mb-2">About this item</h3>
+            <p className="text-[15px] text-muted leading-relaxed font-medium">
               {product.description}
             </p>
           </div>
         )}
 
-        {/* 4. PICHA ZANGU (Thumbnails Ndogo) */}
+        {/* 4. IMAGES GRID */}
         {product.images && product.images.length > 0 && (
           <div>
-            <h3 className="text-[14px] font-bold text-black mb-3">Picha</h3>
-            <div className="grid grid-cols-4 gap-2">
+            <h3 className="text-[14px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">Photos</h3>
+            <div className="grid grid-cols-4 gap-3">
               {product.images.map((img: string, idx: number) => (
                 <button 
                   key={idx} 
                   onClick={() => setLightboxIndex(idx)}
-                  className="aspect-square w-full rounded-[12px] bg-[#F9FAFB] border border-gray-100 overflow-hidden active:opacity-70 transition-opacity"
+                  className="aspect-square w-full rounded-[16px] bg-surface border border-surface-muted overflow-hidden active:scale-95 transition-transform shadow-sm"
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
                 </button>
@@ -129,64 +137,64 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
-        {/* 5. MCHANGANUO WA DATA (Minimal lines) */}
+        {/* 5. DELIVERY & TERMS CARD */}
         <div>
-          <h3 className="text-[14px] font-bold text-black mb-3">Malipo na usafiri</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-              <span className="text-[15px] text-gray-500">Muda wa usafiri</span>
-              <span className="text-[15px] font-bold text-black">Siku {product.delivery_days_limit || '1'}</span>
+          <h3 className="text-[14px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">Terms</h3>
+          <div className="bg-surface rounded-[24px] shadow-sm border border-surface-muted overflow-hidden">
+            <div className="flex justify-between items-center p-5 border-b border-surface-muted">
+              <span className="text-[15px] font-medium text-muted">Delivery timeframe</span>
+              <span className="text-[15px] font-bold text-foreground">{product.delivery_days_limit || '1'} Days</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[15px] text-gray-500">Mlipia ada (3%)</span>
-              <span className="text-[15px] font-bold text-black">
-                {product.fee_payer === 'buyer' ? 'Mteja' : 'Muuzaji'}
+            <div className="flex justify-between items-center p-5">
+              <span className="text-[15px] font-medium text-muted">Escrow fee (3%)</span>
+              <span className="text-[15px] font-bold text-foreground bg-background px-3 py-1 rounded-full border border-surface-muted">
+                {product.fee_payer === 'buyer' ? 'Buyer pays' : 'I will pay'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* 6. GAWANYA KWA MTEJA (Copy Actions - Flat Design) */}
+        {/* 6. SHARE ACTIONS */}
         <div>
-          <h3 className="text-[14px] font-bold text-black mb-3">Sambaza</h3>
-          <div className="flex flex-col gap-2">
+          <h3 className="text-[14px] font-bold text-muted uppercase tracking-widest mb-3 ml-1">Share Deal</h3>
+          <div className="flex flex-col gap-3">
             
             <button 
               onClick={() => handleCopy(dealLink, 'link')}
-              className="w-full bg-[#F9FAFB] text-black p-4 rounded-[16px] active:bg-gray-100 transition-colors flex justify-between items-center"
+              className="w-full bg-surface border border-surface-muted text-foreground py-4 px-5 rounded-[20px] active:scale-[0.98] transition-transform flex justify-between items-center shadow-sm"
             >
               <div className="flex flex-col items-start min-w-0 pr-4">
-                <span className="text-[15px] font-bold mb-0.5">Link ya mteja</span>
-                <span className="text-[13px] text-gray-400 truncate w-full text-left">{dealLink}</span>
+                <span className="text-[15px] font-extrabold mb-0.5">Client Link</span>
+                <span className="text-[13px] text-muted truncate w-full text-left font-medium">{dealLink}</span>
               </div>
-              <span className={`text-[13px] font-bold ${copiedType === 'link' ? 'text-green-600' : 'text-blue-600'}`}>
-                {copiedType === 'link' ? 'Copied' : 'Copy'}
+              <span className={`text-[13px] font-extrabold px-3 py-1.5 rounded-full ${copiedType === 'link' ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-background text-accent border border-surface-muted'}`}>
+                {copiedType === 'link' ? 'Copied!' : 'Copy'}
               </span>
             </button>
 
             <button 
               onClick={() => handleCopy(productCode, 'code')}
-              className="w-full bg-[#F9FAFB] text-black p-4 rounded-[16px] active:bg-gray-100 transition-colors flex justify-between items-center"
+              className="w-full bg-surface border border-surface-muted text-foreground py-4 px-5 rounded-[20px] active:scale-[0.98] transition-transform flex justify-between items-center shadow-sm"
             >
               <div className="flex flex-col items-start min-w-0 pr-4">
-                <span className="text-[15px] font-bold mb-0.5">Code ya bidhaa</span>
-                <span className="text-[14px] text-gray-500 font-mono tracking-wider">{productCode}</span>
+                <span className="text-[15px] font-extrabold mb-0.5">Item Code</span>
+                <span className="text-[14px] text-muted font-mono font-bold tracking-wider">{productCode}</span>
               </div>
-              <span className={`text-[13px] font-bold ${copiedType === 'code' ? 'text-green-600' : 'text-blue-600'}`}>
-                {copiedType === 'code' ? 'Copied' : 'Copy'}
+              <span className={`text-[13px] font-extrabold px-3 py-1.5 rounded-full ${copiedType === 'code' ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-background text-accent border border-surface-muted'}`}>
+                {copiedType === 'code' ? 'Copied!' : 'Copy'}
               </span>
             </button>
 
           </div>
         </div>
 
-        {/* 7. DANGER ZONE (Futa - Safi bila border) */}
-        <div className="pt-4">
+        {/* 7. DANGER ZONE */}
+        <div className="pt-6 pb-8">
           <button 
             onClick={deleteProduct}
-            className="w-full py-4.5 rounded-[16px] text-[15px] font-bold bg-[#FFF0F0] text-red-500 active:bg-[#FFE5E5] transition-colors"
+            className="w-full py-4.5 rounded-[20px] text-[15px] font-extrabold bg-danger-light text-danger active:scale-[0.98] transition-transform border border-red-100"
           >
-            Futa bidhaa
+            Delete Item
           </button>
         </div>
 
@@ -196,25 +204,29 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       {/* 🟢 FULLSCREEN IMAGE LIGHTBOX 🟢 */}
       {/* ========================================= */}
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-sm" onClick={() => setLightboxIndex(null)}>
-          <button className="absolute top-6 right-6 text-white bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        <div className="fixed inset-0 z-[100] bg-foreground/95 flex items-center justify-center backdrop-blur-md animate-fade-in" onClick={() => setLightboxIndex(null)}>
+          <button className="absolute top-12 right-6 text-surface bg-surface-muted/20 p-2.5 rounded-full hover:bg-surface-muted/30 transition-colors">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
-          <img src={product.images[lightboxIndex]} alt="Fullscreen" className="w-full max-h-[85vh] object-contain select-none" onClick={(e) => e.stopPropagation()} />
+          <img src={product.images[lightboxIndex]} alt="Fullscreen" className="w-full max-h-[85vh] object-contain select-none shadow-2xl" onClick={(e) => e.stopPropagation()} />
           
           {product.images.length > 1 && (
-            <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-6 px-4">
-              <button onClick={handlePrevImage} className="w-14 h-14 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 active:scale-95 transition-all">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-8 px-4">
+              <button onClick={handlePrevImage} className="w-14 h-14 bg-surface-muted/20 text-surface rounded-full flex items-center justify-center hover:bg-surface-muted/30 active:scale-90 transition-all backdrop-blur-sm">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
               </button>
-              <button onClick={handleNextImage} className="w-14 h-14 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 active:scale-95 transition-all">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              <button onClick={handleNextImage} className="w-14 h-14 bg-surface-muted/20 text-surface rounded-full flex items-center justify-center hover:bg-surface-muted/30 active:scale-90 transition-all backdrop-blur-sm">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
           )}
         </div>
       )}
 
+      <style dangerouslySetInnerHTML={{__html: `
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+      `}} />
     </div>
   );
 }

@@ -4,11 +4,18 @@
   /* Font yetu ya Inter tuliyoset kwenye layout.tsx */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* Rangi zetu safi (Minimalist) */
-  --color-background: #ffffff;
-  --color-foreground: #000000;
-  --color-surface: #f5f5f7; /* Kijivu laini kama cha Apple form inputs */
-  --color-accent: #007aff; /* iOS Blue kwa ajili ya links */
+  /* RANGI ZETU SAFI (Design System) */
+  --color-background: #f8fafc; /* Rangi ya nyuma ya app nzima (Soft Gray) */
+  --color-foreground: #0f172a; /* Rangi kuu ya maandishi (Karibu na Nyeusi) */
+  --color-surface: #ffffff; /* Rangi ya Kadi na Maboksi (Nyeupe) */
+  --color-surface-muted: #f1f5f9; /* Kijivu laini kwa ajili ya Inputs */
+  
+  --color-muted: #64748b; /* Rangi ya maandishi madogo/maelezo (Gray) */
+  --color-accent: #2563eb; /* Rangi kuu ya App mfano Buttons (iOS Blue) */
+  --color-accent-hover: #1d4ed8; /* Bluu ikiguswa */
+  
+  --color-danger: #ef4444; /* Nyekundu kwa ajili ya Errors */
+  --color-danger-light: #fef2f2; /* Nyekundu iliyofifia sana kwa background ya Error */
 }
 
 /* Background na text color ya default kwa site nzima */

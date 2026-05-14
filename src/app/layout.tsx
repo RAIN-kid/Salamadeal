@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navigation from '@/components/Navigation';
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -10,7 +9,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "SalamaDeal",
-  description: "Biashara salama mtandaoni",
+  description: "Secure escrow payments for your deals.",
 };
 
 export default function RootLayout({
@@ -19,22 +18,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sw" className={inter.variable}>
-      <body className="font-sans antialiased bg-white text-black selection:bg-gray-200">
+    <html lang="en" className={inter.variable}>
+      {/* 
+        Tumeondoa hardcoded colors hapa! 
+        Sasa hivi inasikiliza globals.css (var(--color-background) na var(--color-foreground))
+      */}
+      <body className="font-sans antialiased selection:bg-blue-200">
         
-        {/* Mfumo mzima umebebwa na Flexbox */}
-        <div className="flex min-h-screen w-full bg-white">
-          
-          {/* Navigation ipo hapa. Kwenye PC inakuwa Sidebar, kwenye simu inakuwa BottomNav */}
-          <Navigation />
-          
-          {/* Hili ni eneo la kurasa zako. Lipo wazi na safi. */}
-          <main className="flex-1 min-w-0 pb-24 md:pb-0 relative">
-            <div className="max-w-4xl mx-auto w-full min-h-screen bg-white">
-              {children}
-            </div>
+        <div className="flex min-h-screen w-full justify-center">
+          {/* Hapa pia tunatumia bg-background badala ya bg-slate-50 */}
+          <main className="w-full max-w-md min-h-screen relative shadow-2xl shadow-black/5 bg-background overflow-x-hidden">
+            {children}
           </main>
-          
         </div>
 
       </body>

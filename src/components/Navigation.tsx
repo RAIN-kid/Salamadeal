@@ -8,20 +8,21 @@ export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   
-  // State kwa ajili ya kufunga/kufungua Sidebar kwenye PC
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // Hii inazuia Hydration Error
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  // HII NDIO LOGIC YA KUFICHA NAVBAR KWENYE LOGIN/SIGNUP
+  const isAuthPage = pathname?.includes('/auth');
+
+  // Kama mfumo haujakaa sawa AU upo kwenye page za Auth, ficha Navigation yote
+  if (!mounted || isAuthPage) return null;
 
   const isActive = (path: string) => pathname === path;
   
-  // SHERIA: Hakuna bluu. Active = Black & bg-gray-100, Inactive = Gray
   const activeClassDesk = "text-black bg-gray-100";
   const inactiveClassDesk = "text-gray-500 hover:text-black hover:bg-gray-50";
 
@@ -34,18 +35,15 @@ export default function Navigation() {
 
   return (
     <>
-      {/* ======================================================== */}
-      {/* 1. SIDEBAR YA DESKTOP/PC (Sticky, Inasukuma Content) */}
-      {/* ======================================================== */}
+      {/* 1. SIDEBAR YA DESKTOP/PC */}
       <div className={`hidden md:flex flex-col sticky top-0 h-screen bg-white border-r border-gray-100 transition-all duration-300 z-40 flex-shrink-0 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
         
-        {/* Logo & Toggle Button */}
         <div className={`flex items-center h-20 border-b border-gray-50 ${isSidebarOpen ? 'justify-between px-6' : 'justify-center'}`}>
-          {isSidebarOpen && <span className="text-[22px] font-extrabold text-black tracking-tight">SalamaDeal</span>}
+          {isSidebarOpen && <span className="text-[20px] font-extrabold text-black tracking-tight">SalamaDeal</span>}
           
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-            className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-xl transition-colors"
+            className="p-2 text-gray-400 hover:text-black hover:bg-gray-50 rounded-xl transition-colors"
           >
             {isSidebarOpen ? (
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
@@ -55,7 +53,6 @@ export default function Navigation() {
           </button>
         </div>
 
-        {/* Links */}
         <div className="flex-1 py-6 px-3 space-y-2 overflow-y-auto hide-scrollbar">
           {navItems.map((item) => (
             <Link 
@@ -71,7 +68,6 @@ export default function Navigation() {
           ))}
         </div>
 
-        {/* Create Button (Inabadilika kulingana na ukubwa wa Sidebar) */}
         <div className="p-4 border-t border-gray-50">
           <button 
             onClick={() => router.push('/products/new')} 
@@ -83,9 +79,7 @@ export default function Navigation() {
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* 2. BOTTOM NAV YA SIMU (Mobile Only) */}
-      {/* ======================================================== */}
+      {/* 2. BOTTOM NAV YA SIMU */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 pb-safe">
         <div className="flex justify-around items-end h-[64px] pb-2 px-1 relative">
           
@@ -99,11 +93,10 @@ export default function Navigation() {
             <span className="text-[10px] font-bold">Dili</span>
           </Link>
 
-          {/* Plus Button - Mviringo Kamili */}
           <div className="flex flex-col items-center justify-center w-full relative -top-3">
             <button 
               onClick={() => router.push('/products/new')} 
-              className="w-[52px] h-[52px] bg-black text-white rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+              className="w-[52px] h-[52px] bg-black text-white rounded-full flex items-center justify-center active:scale-95 transition-transform"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
             </button>
@@ -122,7 +115,6 @@ export default function Navigation() {
         </div>
       </div>
 
-      {/* CSS kuficha scrollbar kwenye Sidebar */}
       <style dangerouslySetInnerHTML={{__html: `
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
